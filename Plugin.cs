@@ -1,12 +1,14 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
+using CounterStrikeSharp.API.Core.Capabilities;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PlayerSkin.Models;
+using ZombieSharpAPI;
 using static CounterStrikeSharp.API.Core.Listeners;
 
 namespace PlayerSkin
@@ -19,9 +21,11 @@ namespace PlayerSkin
 
         public Settings settings { get; set; } = new Settings();
         public Dictionary<CCSPlayerController, string> playerSkin { get; set; } = new Dictionary<CCSPlayerController, string>();
+        private static PluginCapability<IZombieSharpAPI> _zombieCap { get; } = new("zombiesharp");
         bool configLoad = false;
         private ILogger<Plugin> _logger;
         private readonly IDatabase _database;
+        private IZombieSharpAPI? _zombieSharpAPI;
 
         public Plugin(ILogger<Plugin> logger, IDatabase database)
         {
@@ -38,6 +42,11 @@ namespace PlayerSkin
             RegisterListener<OnClientDisconnect>(OnClientDisconnect);
 
             _database.Initialize(this);
+        }
+
+        public override void OnAllPluginsLoaded(bool hotReload)
+        {
+            _zombieSharpAPI = _zombieCap.Get();
         }
 
         public void OnServerPrecacheResources(ResourceManifest manifest)
@@ -197,6 +206,12 @@ namespace PlayerSkin
 
             if (pawn == null)
                 return;
+
+            if(_zombieSharpAPI != null)
+            {
+                if (_zombieSharpAPI.ZS_IsClientZombie(client))
+                    return;
+            }
 
             pawn.SetModel(data.ModelPath!);
         }

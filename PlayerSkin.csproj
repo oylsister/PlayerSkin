@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="CounterStrikeSharp.API" Version="1.0.284" />
     <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="IZombieSharpAPI" Version="1.2.7.1" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
